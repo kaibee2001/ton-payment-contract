@@ -1,0 +1,36 @@
+() recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
+    if (in_msg_body.slice_empty?()) { ;; ignore empty messages
+        return ();
+    }
+
+    slice cs = in_msg_full.begin_parse();
+    int flags = cs~load_uint(4);
+    slice sender_address = cs~load_msg_addr();
+    cs~load_msg_addr(); ;; skip dst
+    cs~load_coins(); ;; skip value
+    cs~skip_bits(1); ;; skip extracurrency collection
+    cs~load_coins(); ;; skip ihr_fee
+    int fwd_fee = muldiv(cs~load_coins(), 3, 2); 
+    int op = in_msg_body~load_uint(32);
+
+    int query_id = in_msg_body~load_uint(64);
+
+    load_storage();
+
+    if (op == claim_token) {
+        claim(sender_address, in_msg_body, query_id);
+        return ();
+    }
+
+    if (op == check_signature_test) {
+        check_sign_test(in_msg_body, query_id);
+        return ();
+    }
+
+    if (equal_slices(sender_address, storage::admin_address)) {
+        handle_admin_messages(op, query_id, in_msg_body, my_balance);
+        return ();
+    }
+
+    throw(WRONG_OP);
+}

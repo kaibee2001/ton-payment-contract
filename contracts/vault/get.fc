@@ -1,0 +1,4 @@
+(slice, slice, slice, cell, int) get_vault_data() method_id {
+    load_storage();
+    return (storage::signer_address, storage::admin_address, storage::payment_token_address, storage::jetton_wallet_code, storage::paused);
+}

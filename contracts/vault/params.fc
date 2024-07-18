@@ -1,0 +1,8 @@
+;; transfer token
+int op::transfer() asm "0xf8a7ea5 PUSHINT";
+
+;; gas 
+int gas_consumption() asm "15000000 PUSHINT"; ;; 0.015 TON for mainnet
+
+;; errors
+const WRONG_OP = 0xffff;

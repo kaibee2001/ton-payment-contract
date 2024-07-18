@@ -1,0 +1,28 @@
+;; () deposit(slice sender_address, slice in_msg_body, int query_id, slice vault_address) impure inline {
+
+;;     slice jetton_master_address = in_msg_body~load_msg_addr();
+   
+;;     int forward_ton_amount = in_msg_body~load_coins();
+;;     int token_balances = in_msg_body~load_coins();    
+    
+;;     transfer_token_to_vault(sender_address, vault_address, query_id, jetton_master_address, forward_ton_amount, token_balances);
+;; }
+
+() claim(slice sender_address, slice in_msg_body, int query_id) impure inline {
+    int forward_ton_amount = in_msg_body~load_coins();
+    int token_balances = in_msg_body~load_coins();
+
+    transfer_token(my_address(), sender_address, query_id, storage::payment_token_address, forward_ton_amount, token_balances);
+
+}
+
+() check_sign_test(slice in_msg_body, int query_id) impure inline {
+    int hash_test = in_msg_body~load_uint(256);
+    int value = in_msg_body~load_coins();
+
+    int hash = slice_hash(begin_cell().store_coins(value).end_cell().begin_parse());
+
+    int result = check_signature()
+    ~dump(hash_test);
+    ~dump(hash);
+}
